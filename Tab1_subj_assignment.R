@@ -1,10 +1,17 @@
 #install.packages("dplyr")
 #install.packages("tidyr")
 #install.packages("gt")
+#install.packages("gtsummary")
 
 library(dplyr)
 library(tidyr)
 library(gt)
+library(gtsummary)
+
+
+
+ #setwd("C:/Users/suvar/Rworkdr/TLF")
+ #dir.create("outputs", showWarnings = FALSE)
 
 adams_path <- path.expand("C:/Users/suvar/Rworkdr")
 adsl <- get(load(paste0(adams_path, "/admiral_adsl.rda"))) %>% 
@@ -59,7 +66,7 @@ function_name(out01, SAFFL)
 final <- out01 %>% 
 select(Population, Statistic, t1, t2, t3, t4)
 
-final %>%
+tbl <- final %>%
   gt() %>%
   cols_label(
     t1 = "Placebo",
@@ -74,3 +81,14 @@ final %>%
 tab_options(
         table.font.names = "Courier, monospace"
         )
+
+#gt_tbl <- as_gt(tbl)
+
+# Save outputs ----------------------------------------------
+gtsave(tbl, "outputs/Tab1_subj_assignment.html")
+
+
+# End log ----------------------------------------------------
+cat("HTML created: outputs/Tab1_subj_assignment.html\n")
+
+cat("Program ended:", as.character(Sys.time()), "\n")
