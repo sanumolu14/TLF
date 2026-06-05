@@ -4,6 +4,8 @@
 library(flextable)
 library(tidyverse) ## dplyr already included in tidyverse package
 library(dplyr)
+library(gt)
+library(gtsummary)
 ####-------------Clear environment--------------##
 
 rm(list = ls(all.names = TRUE))
@@ -199,3 +201,55 @@ ft <- hline_bottom(ft, border = officer :: fp_border (width = 1))
 
 # Save RTF
 save_as_rtf(ft, path = file.path(out_path, "t_demog.rtf"))
+
+tbl1 <- tbl %>%
+  gt() %>% 
+  cols_width(
+    row_text ~ px(200),
+    Placebo  ~ px(100),
+    Xanomeline_High_Dose ~ px(100),
+    Xanomeline_Low_Dose ~ px(100)
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = starts_with("Xanomeline")
+  ) %>%
+  cols_align(
+    align   = "center",
+    columns = Placebo
+  ) %>%
+  cols_align(
+    align = "left",
+    columns = row_text
+  ) %>%
+  cols_label(
+    row_text = "",
+    Placebo = "Placebo",
+    Xanomeline_High_Dose = md("Xanomeline<br>High Dose")  ,
+    Xanomeline_Low_Dose = md("Xanomeline<br>Low Dose") 
+  ) %>% 
+  tab_header(
+    title = md(" ** Table 14.1.1: Demographic Summary by Treatment ** " )
+  ) %>%
+  tab_options(
+    table.font.names = "Courier, monospace",
+    data_row.padding     = px(4),
+    column_labels.padding = px(6)
+  ) %>% 
+tab_style(
+  style = cell_text(indent = px(30)),
+  locations = cells_body(
+    columns = row_text,
+    rows    = (Placebo != "")
+   )
+  ) %>% 
+  tab_style(
+    style     = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = row_text,
+      rows    = (Placebo == "")     # ✅ bold rows with NO Placebo values
+    )
+  )
+
+gtsave(tbl1, "outputs/t_demog.html")
+gtsave(tbl1, "outputs/t_demog.pdf")
